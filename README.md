@@ -4,7 +4,9 @@
 
 ## 플레이
 
-[maze.html](maze.html) 파일을 브라우저로 열면 바로 시작됩니다.
+**https://sduiond.github.io/maze-game/** 에서 바로 플레이할 수 있습니다.
+
+내려받아 쓰는 경우 [index.html](index.html) 파일을 브라우저로 열면 됩니다.
 
 ## 조작
 
