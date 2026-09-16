@@ -1,4 +1,25 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>미로찾기</title>
+<meta name="description" content="키보드 방향키와 스와이프로 조작하는 미로찾기 게임. 판마다 새 미로가 생성됩니다.">
+<meta name="theme-color" content="#0E2740">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="미로찾기">
+<meta property="og:title" content="미로찾기">
+<meta property="og:description" content="판마다 새로 생성되는 미로. 방향키와 스와이프로 출발점에서 도착점까지 — 기록에 도전해보세요.">
+<meta property="og:url" content="https://sduiond.github.io/maze-game/">
+<meta property="og:image" content="https://sduiond.github.io/maze-game/og-image.png">
+<meta property="og:image:secure_url" content="https://sduiond.github.io/maze-game/og-image.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="청사진 도면 위에 그려진 미로와 '미로찾기' 제목">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="미로찾기">
+<meta name="twitter:description" content="판마다 새로 생성되는 미로. 방향키와 스와이프로 출발점에서 도착점까지.">
+<meta name="twitter:image" content="https://sduiond.github.io/maze-game/og-image.png">
+
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
 <style>
@@ -29,7 +50,10 @@
       linear-gradient(90deg,var(--hair-soft) 1px,transparent 1px);
     background-size:28px 28px;
     background-position:-1px -1px;
+    overscroll-behavior:none;
+    -webkit-text-size-adjust:100%;
   }
+  canvas{-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
   .sheet{
     width:100%;
     max-width:560px;
@@ -114,10 +138,22 @@
   }
   .primary{background:var(--marker);border-color:var(--marker);color:#22160E;font-weight:600}
   .primary:hover{background:#FF8D58;border-color:#FF8D58}
-  @media (max-width:430px){
-    .titleblock{grid-template-columns:1fr}
-    .stats{justify-content:flex-start}
+  .touch-only{display:none}
+  @media (pointer:coarse){
+    .key-only{display:none}
+    .touch-only{display:inline}
+    button{padding:13px 16px}
+  }
+  @media (max-width:520px){
+    body{padding-block:14px 20px;padding-inline:12px}
+    .sheet{gap:12px}
+    .titleblock{grid-template-columns:1fr;gap:10px;padding:11px 12px}
+    .stats{justify-content:space-between;gap:10px}
     .stat{align-items:flex-start}
+    .controls{gap:10px}
+    .note{max-width:none;flex:1 1 100%}
+    .buttons{flex:1 1 100%}
+    .buttons button{flex:1 1 0;min-width:0}
   }
   @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -145,7 +181,7 @@
   </div>
 
   <div class="controls">
-    <p class="note"><kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd> 방향키 또는 <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> 로 움직입니다.</p>
+    <p class="note"><span class="key-only"><kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd> 방향키 또는 <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> 로 움직입니다.</span><span class="touch-only">가고 싶은 방향으로 미로를 쓸어서 움직입니다.</span></p>
     <div class="buttons">
       <button id="hint">힌트 보기 (+3초)</button>
       <button id="reset">이 미로 다시 시작</button>
@@ -220,7 +256,9 @@
 
   function layout(){
     var dpr=Math.min(window.devicePixelRatio||1,2);
-    cssSize=Math.min(cv.parentElement.clientWidth,560);
+    // 가로 폭과 함께 화면 높이도 고려해, 가로 모드 폰에서도 도면 전체가 보이게 한다
+    var avail=window.innerHeight-(window.innerWidth<520?190:210);
+    cssSize=Math.max(240,Math.min(cv.parentElement.clientWidth,560,avail));
     cv.style.height=cssSize+'px';
     cv.width=Math.round(cssSize*dpr);
     cv.height=Math.round(cssSize*dpr);
